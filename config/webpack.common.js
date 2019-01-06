@@ -3,21 +3,22 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const devMode = process.env.npm_lifecycle_event !== 'build';
+
 module.exports = {
   entry: {
     index: './src/index.jsx'
   },
   output: {
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve('./dist')
   },
   resolve: {
     extensions: ['.mjs', '.js', '.json', '.jsx']
   },
   plugins: [
-    new CleanWebpackPlugin(['dist']),
-    //  {
-    //  root: path.resolve()
-    //  }),
+    new CleanWebpackPlugin(['dist'],
+      {
+        root: path.resolve()
+      }),
     new HtmlWebpackPlugin({
       inject: 'body',
       filename: 'index.html',
