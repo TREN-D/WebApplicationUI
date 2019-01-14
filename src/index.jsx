@@ -1,9 +1,14 @@
 import { render } from 'react-dom';
 import React from 'react';
-import MainApp from './app/components/MainApp';
+import './style.scss';
 import 'bootstrap/dist/css/bootstrap.css';
+import App from './app/App';
 
 render(
-  <MainApp />,
+  <App />,
   document.getElementById('root')
 );
+
+if (module.hot) {
+  module.hot.accept();
+}

@@ -1,36 +1,29 @@
 const path = require('path');
-const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-const devMode = process.env.NODE_ENV !== 'production';
+const devMode = process.env.npm_lifecycle_event !== 'build';
 
 module.exports = {
   entry: {
     index: './src/index.jsx'
   },
   output: {
-    filename: devMode ? '[name].[hash].bundle.js' : '[name].[contenthash].bundle.js',
-    path: path.resolve('./', 'dist')
+    path: path.resolve('./dist')
   },
   resolve: {
     extensions: ['.mjs', '.js', '.json', '.jsx']
   },
   plugins: [
-    new CleanWebpackPlugin(['dist'], {
-      root: path.resolve()
-    }),
+    new CleanWebpackPlugin(['dist'],
+      {
+        root: path.resolve()
+      }),
     new HtmlWebpackPlugin({
-      title: 'My App',
       inject: 'body',
       filename: 'index.html',
-      template: './public/template.html'
-    }),
-    new webpack.HashedModuleIdsPlugin(),
-    new MiniCssExtractPlugin({
-      filename: devMode ? '[name].[hash].css' : '[name].[contenthash].css',
-      chunkFilename: devMode ? '[id].[hash].css' : '[id].[contenthash].css'
+      template: './src/index.html',
+      favicon: './src/assets/images/favicon.ico'
     })
   ],
   module: {
@@ -47,25 +40,19 @@ module.exports = {
         loader: 'babel-loader'
       },
       {
-        test: /\.(sa|sc|c)ss?$/,
-        use: [
-          devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
-          'css-loader',
-          'sass-loader'
-        ]
-      },
-      {
         test: /\.(png|svg|jpg|gif)?$/,
         loader: 'file-loader',
         options: {
-          outputPath: 'assets/images'
+          outputPath: 'public/images',
+          publicPath: devMode ? '' : '../images/'
         }
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)?$/,
         loader: 'file-loader',
         options: {
-          outputPath: 'assets/fonts'
+          outputPath: 'public/fonts',
+          publicPath: devMode ? '' : '../fonts/'
         }
       }
     ]
@@ -73,17 +60,20 @@ module.exports = {
   optimization: {
     runtimeChunk: 'single',
     splitChunks: {
+      chunks: 'all',
+      maxInitialRequests: Infinity,
+      minSize: 0,
       cacheGroups: {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
-          chunks: 'all'
-        },
-        styles: {
-          name: 'styles',
-          test: /\.(sa|sc|c)ss?$/,
-          chunks: 'all',
-          enforce: true
+          name(module) {
+            // get the name. E.g. node_modules/packageName/not/this/part.js
+            // or node_modules/packageName
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+
+            // npm package names are URL-safe, but some servers don't like @ symbols
+            return `npm.${packageName.replace('@', '')}`;
+          }
         }
       }
     }

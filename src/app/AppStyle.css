@@ -1,0 +1,10 @@
+@font-face {
+  font-family: 'Awesome';
+  src:  url('../assets/fonts/Cicle_Semi.ttf') format('truetype');
+}
+
+.awesomeFont {
+  font-family: 'Awesome';
+  color: green;
+  font-size: 200px;
+}
